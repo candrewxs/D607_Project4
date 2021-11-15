@@ -1,6 +1,6 @@
 ---
 title: "D607 Project 4"
-author: "Coffy Andrews-Guo"
+author: "Coffy Andrews-Guo, Krutika Patel"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   prettydoc::html_pretty:
@@ -350,4 +350,18 @@ confusionMatrix(data = factor(xg_pred, levels=c(1,0)),
 
 ## Conclusion
 
-The text classification analysis based on Random Forest, Naive Bayes, and XGBoost effectively categorized an email as spam or ham. I had difficulies on loading and unzipping the file format in Github.  
+This text classification of emails is performed using three algorithms for comparison purposes. The three algorithms used were Random Forest, Naive Bayes, and XGBoost. The algorithms created models and trained them using some of the data and tested the effectiveness of the model using a test subset of the data.
+One of the difficulties faced during this project was to make the program extract the data from a github repository. In order to reproduce this project, change the data_spam and data_ham variables to the respective data's path on your machine.  
+
+
+### References:
+* Naïve Bayes Classifier · UC Business Analytics R Programming Guide. (2018). Github.io. http://uc-r.github.io/naive_bayes
+* Kuhn, M. (n.d.). 3 Pre-Processing | The caret Package. In topepo.github.io. Retrieved November 15, 2021, from https://topepo.github.io/caret/pre-processing.html#putting-it-all-together
+* Index of /old/publiccorpus. (n.d.). Spamassassin.apache.org. https://spamassassin.apache.org/old/publiccorpus/
+
+
+Source: 
+
+[GitHub](https://github.com/candrewxs/D607_Project4/blob/main/Project%204.Rmd)
+[RPubs](https://rpubs.com/blesned/HamSpam)
+

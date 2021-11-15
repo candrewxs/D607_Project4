@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="Coffy Andrews-Guo" />
+<meta name="author" content="Coffy Andrews-Guo, Krutika Patel" />
 
 
 <title>D607 Project 4</title>
@@ -145,7 +145,7 @@ a.sourceLine {
 <div class="table cover">
 <div class="cover-card table-cell table-middle">
 <span class="author_name">D607 Project 4</span>
-<span class="author_bio mbm">Coffy Andrews-Guo</span>
+<span class="author_bio mbm">Coffy Andrews-Guo, Krutika Patel</span>
 <span class="author_bio mbm">14 November, 2021</span>
 </div>
 </div>
@@ -223,8 +223,8 @@ a.sourceLine {
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">options =</span> <span class="fu">list</span>(<span class="at">scrollX =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">paging=</span><span class="cn">TRUE</span>,</span>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">fixedHeader=</span><span class="cn">TRUE</span>))</span></code></pre></div>
-<div id="htmlwidget-9486a1dd7c6b58773f64" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9486a1dd7c6b58773f64">{"x":{"filter":"none","vertical":false,"extensions":["FixedColumns","FixedHeader"],"data":[["1","2"],["HAM","SPAM"],[0,1],[2551,501]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>class<\/th>\n      <th>target<\/th>\n      <th>n<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"paging":true,"fixedHeader":true,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-1215f95735cdb5909dd9" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1215f95735cdb5909dd9">{"x":{"filter":"none","vertical":false,"extensions":["FixedColumns","FixedHeader"],"data":[["1","2"],["HAM","SPAM"],[0,1],[2551,501]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>class<\/th>\n      <th>target<\/th>\n      <th>n<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"paging":true,"fixedHeader":true,"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>Clean the dataframe text files, remove the html formatting, all punctuation, new lines, and digits.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>data<span class="ot">&lt;-</span>data <span class="sc">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">message=</span> <span class="fu">str_remove_all</span>(message, <span class="at">pattern =</span> <span class="st">&quot;&lt;.*?&gt;&quot;</span>)) <span class="sc">%&gt;%</span></span>
@@ -259,8 +259,8 @@ a.sourceLine {
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                         <span class="at">paging=</span><span class="cn">TRUE</span>,</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                         <span class="at">fixedHeader=</span><span class="cn">TRUE</span>,</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                         <span class="at">pageLength =</span> <span class="dv">5</span>))</span></code></pre></div>
-<div id="htmlwidget-5e9fc4afc02eeacfa0f5" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5e9fc4afc02eeacfa0f5">{"x":{"filter":"none","vertical":false,"extensions":["FixedColumns","FixedHeader"],"data":[["963","2339","985","2241","2360"],["HAM","HAM","HAM","HAM","HAM"],[963,2339,985,2241,2360]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>class<\/th>\n      <th>id<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"paging":true,"fixedHeader":true,"pageLength":5,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d60c12d79118488b5e26" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d60c12d79118488b5e26">{"x":{"filter":"none","vertical":false,"extensions":["FixedColumns","FixedHeader"],"data":[["963","2339","985","2241","2360"],["HAM","HAM","HAM","HAM","HAM"],[963,2339,985,2241,2360]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>class<\/th>\n      <th>id<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"paging":true,"fixedHeader":true,"pageLength":5,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="convert-the-class-variable-from-character-to-factor" class="section level2">
@@ -473,7 +473,7 @@ a.sourceLine {
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>( classifier_nb <span class="ot">&lt;-</span> <span class="fu">naiveBayes</span>(dataTrain, dataTrain<span class="sc">$</span>class, <span class="at">laplace =</span> <span class="dv">1</span>,</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">trControl =</span> control,<span class="at">tuneLength =</span> <span class="dv">7</span>) )</span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    5.16    0.00    5.16</code></pre>
+##    4.81    0.00    4.81</code></pre>
 <p>Making Predictions and evaluating the Naive Bayes Classifier.</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="ot">=</span> <span class="fu">predict</span>(classifier_nb, <span class="at">type =</span> <span class="st">&#39;class&#39;</span>, <span class="at">newdata =</span> dataTest)</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -520,7 +520,7 @@ a.sourceLine {
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">max.depth =</span> <span class="dv">7</span>, <span class="at">eta =</span> <span class="dv">1</span>, </span>
 <span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">nthread =</span> <span class="dv">2</span>, <span class="at">nrounds =</span> <span class="dv">2</span>,</span>
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">objective =</span> <span class="st">&quot;binary:logistic&quot;</span>)</span></code></pre></div>
-<pre><code>## [20:45:51] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;binary:logistic&#39; was changed from &#39;error&#39; to &#39;logloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
+<pre><code>## [23:34:23] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &#39;binary:logistic&#39; was changed from &#39;error&#39; to &#39;logloss&#39;. Explicitly set eval_metric if you&#39;d like to restore the old behavior.
 ## [1]  train-logloss:0.129703 
 ## [2]  train-logloss:0.044723</code></pre>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>xg_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(xgb, <span class="fu">as.matrix</span>(test_text))</span></code></pre></div>
@@ -561,7 +561,17 @@ a.sourceLine {
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>The text classification analysis based on Random Forest, Naive Bayes, and XGBoost effectively categorized an email as spam or ham. I had difficulies on loading and unzipping the file format in Github.</p>
+<p>This text classification of emails is performed using three algorithms for comparison purposes. The three algorithms used were Random Forest, Naive Bayes, and XGBoost. The algorithms created models and trained them using some of the data and tested the effectiveness of the model using a test subset of the data. One of the difficulties faced during this project was to make the program extract the data from a github repository. In order to reproduce this project, change the data_spam and data_ham variables to the respective data’s path on your machine.</p>
+<div id="references" class="section level3">
+<h3>References:</h3>
+<ul>
+<li>Naïve Bayes Classifier · UC Business Analytics R Programming Guide. (2018). Github.io. <a href="http://uc-r.github.io/naive_bayes" class="uri">http://uc-r.github.io/naive_bayes</a></li>
+<li>Kuhn, M. (n.d.). 3 Pre-Processing | The caret Package. In topepo.github.io. Retrieved November 15, 2021, from <a href="https://topepo.github.io/caret/pre-processing.html#putting-it-all-together" class="uri">https://topepo.github.io/caret/pre-processing.html#putting-it-all-together</a></li>
+<li>Index of /old/publiccorpus. (n.d.). Spamassassin.apache.org. <a href="https://spamassassin.apache.org/old/publiccorpus/" class="uri">https://spamassassin.apache.org/old/publiccorpus/</a></li>
+</ul>
+<p>Source:</p>
+<p><a href="https://github.com/candrewxs/D607_Project4/blob/main/Project%204.Rmd">GitHub</a> <a href="https://rpubs.com/blesned/HamSpam">RPubs</a></p>
+</div>
 </div>
 </div>
 </article>

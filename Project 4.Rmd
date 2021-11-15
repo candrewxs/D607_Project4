@@ -1,0 +1,353 @@
+---
+title: "D607 Project 4"
+author: "Coffy Andrews-Guo"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  prettydoc::html_pretty:
+    theme: leonids
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Document Classification - Ham / Spam 
+
+This assignment is to classify new "test" documents using already classified "training" documents from an open source anti-spam platform, [Apache SpamAssassin](https://spamassassin.apache.org/). 
+
+### Load Libraries
+We will being to load libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(e1071)
+library(tm)
+library(tidytext)
+library(dplyr)
+library(caret)
+library(xgboost)
+library(SnowballC)
+library(RColorBrewer)
+library(ggplot2)
+library(wordcloud)
+```
+
+
+## Load Files from Local Drive
+
+The files were download from [Apache SpamAssassin - Old - Public Corpus](https://spamassassin.apache.org/old/publiccorpus/) platform to access email and block spam (unsolicited email) to filter and classify.  
+
+This analysis used two datasets for the parent directory:
+* [20021010 Easy Ham](https://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2)
+* [20021010 Spam](https://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2)
+
+The original file extension are 'tar.bz2', that was downloaded to my local drive and unzipped.  
+
+```{r message=FALSE}
+spam_path <- "C:/Users/andre/OneDrive/Documents/GitHub/D607_Project4/Data/spam"
+ham_path <- "C:/Users/andre/OneDrive/Documents/GitHub/D607_Project4/Data/easy_ham"
+```
+
+
+
+## This function crawls through the files and extracts the messages in there raw form. 
+```{r message=FALSE, warning=FALSE}
+make.data.frame<- function(path, class){
+  # Dig through the directories for messages
+  files <- list.files(path=path, 
+                      full.names=TRUE, 
+                      recursive=TRUE)
+  # Read a file once directories are gone
+  message<-lapply(files, function(x) {
+    text_body<-read_file(x)
+    })
+  # Add to dataframe and assign "id" column
+  message<-unlist(message)
+  data<-as.data.frame(message)
+  data$class<-class
+  return (data)
+}
+```
+
+### Make SPAM and HAM dataframes and bind them
+```{r}
+data_spam<-make.data.frame(spam_path, class="SPAM")
+data_ham<-make.data.frame(ham_path, class="HAM")
+data<-rbind(data_spam, data_ham)
+```
+
+
+### Text Clean up
+
+The dataframe will include a class column designated by document type, `SPAM` and `HAM`. Creating the dataframe with two variables and a numeric target class will be used in some classifiers. 
+```{r message=FALSE}
+data_spam<-data %>%
+  filter(class == "SPAM") %>%
+  mutate(target = 1)
+data_ham<- data %>%
+  filter(class == "HAM") %>%
+  mutate(target = 0)
+data<-rbind(data_spam, data_ham)
+data$id <- 1:nrow(data)
+DT::datatable(data %>%
+              count(class, target),
+         extensions = c('FixedColumns',"FixedHeader"),
+          options = list(scrollX = TRUE,
+                         paging=TRUE,
+                         fixedHeader=TRUE))
+```
+
+Clean the dataframe text files, remove the html formatting, all punctuation, new lines, and digits.  
+```{r message=FALSE}
+data<-data %>%
+  mutate(message= str_remove_all(message, pattern = "<.*?>")) %>%
+  mutate(message= str_remove_all(message, pattern = "[:digit:]")) %>%
+  mutate(message= str_remove_all(message, pattern = "[:punct:]")) %>%
+  mutate(message= str_remove_all(message, pattern = "[\n]")) %>%
+  mutate(message= str_to_lower(message)) %>%
+  unnest_tokens(output=text,input=message,
+                token="paragraphs",
+                format="text") %>%
+  anti_join(stop_words, by=c("text"="word"))
+```
+
+```{r}
+glimpse(data)
+```
+
+```{r}
+table(data$class)
+```
+
+We will rearrange the dataset for use in the train, test splits. 
+```{r}
+set.seed(9450)
+# randomize index
+row_shuffle <- sample(nrow(data))
+# reorder index
+data<-data[row_shuffle,]
+DT::datatable(data[1:5,c("class","id")],
+         extensions = c('FixedColumns',"FixedHeader"),
+          options = list(scrollX = TRUE,
+                         paging=TRUE,
+                         fixedHeader=TRUE,
+                         pageLength = 5))
+```
+
+## Convert the 'class' variable from character to factor
+```{r}
+data$class <- as.factor(data$class)
+prop.table(table(data$class))
+```
+
+
+## Document Term Matrix
+
+The `tm` package was used to vectorize the words into a corpus of messages..  
+```{r}
+text_corpus <- VCorpus(VectorSource(data$text))
+```
+
+
+Clean-up corpus
+```{r}
+text_corpus = tm_map(text_corpus, content_transformer(stringi::stri_trans_tolower))
+text_corpus = tm_map(text_corpus, removeNumbers)
+text_corpus = tm_map(text_corpus, removePunctuation)
+text_corpus = tm_map(text_corpus, stripWhitespace)
+text_corpus = tm_map(text_corpus, removeWords, stopwords("english"))
+text_corpus = tm_map(text_corpus, stemDocument)
+```
+
+
+Create a Document Term Matrix, presenting a bag-of-words vectorizer for each message in the dataset. The columns represents the count frequency of each word in the corpus. 
+
+```{r}
+# For tokens by message
+text_dtm <- DocumentTermMatrix(text_corpus, control =
+                                 list(stemming = TRUE))
+dim(text_dtm)  # 3052 / 60912
+```
+
+Sparse terms removed, reducing the matrix
+```{r}
+text_dtm <- removeSparseTerms(text_dtm, 0.999)
+dim(text_dtm)  # 3052 / 9313
+```
+
+Inspect the corpus
+```{r}
+inspect(text_dtm[50:70, 30:50])
+```
+
+## Word Frequency
+
+```{r}
+freq<- sort(colSums(as.matrix(text_dtm)), decreasing=TRUE)
+head(freq, 10) # this is the least 
+```
+
+### Visualizing Word Frequency
+
+BarPlot
+```{r}
+word_freq<- data.frame(word=names(freq), freq=freq)
+head(word_freq)
+```
+```{r word-freq, fig.cap= "Word Frequency in Emails"}
+word_freq_bp <- ggplot(subset(word_freq, freq > 2000), aes(x=reorder(word, -freq), y =freq)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+word_freq_bp
+```
+
+```{r}
+set.seed(3000)
+wordcloud(words = word_freq$word, freq = word_freq$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(12, "Paired"))
+```
+
+
+## Text Classification 
+
+### Convert word frequency into logical value.
+The term frequencies are replaced by Boolean presence/absence features for sentiment classification.
+```{r}
+convert_count <- function(x) {
+  y <- ifelse(x > 0, 1,0)
+  y <- factor(y, levels=c(0,1), labels=c("No", "Yes"))
+  y
+}
+
+# Apply the convert_count function to get final training and testing DTMs
+datasetNB <- apply(text_dtm, 2, convert_count)
+
+dataset = as.data.frame(as.matrix(datasetNB))
+```
+
+```{r}
+dataset$class = data$class
+str(dataset$class)
+```
+
+
+### Data Splitting Based on the Outcome 
+
+The function createDataPartition can be used to create balanced splits of the data. If the y argument to this function is a factor, the random sampling occurs within each class and should preserve the overall class distribution of the data. For example, to create a single 80/20% split of the data:
+```{r}
+set.seed(3000)  # caret function
+
+train.set <- createDataPartition(dataset$class, p=.8, list = FALSE, times = 1)
+head(train.set)
+```
+
+### Create both train and test and check the proportion of the data split.
+```{r}
+dataTrain <- data[ train.set,]
+dataTest <- data[ -train.set,]
+
+prop.table(table(dataTrain$class))
+```
+```{r}
+prop.table(table(dataTest$class))
+```
+
+
+
+## Model Fitting
+
+### Analysis for this text classification
+
+*Random Forest via Ranger, an alternative package for fitting a random forest
+*XGBoost, an alternative boosting package
+*Naïve Bayes Classifier (NBC)
+
+We will be building our model on 3 different Machine Learning algorithms which are `Random Forest, Naive Bayes and XGBoost: Extreme Gradient Boosting` for the purpose of deciding which perform the best.
+
+### Random Forest Classifier
+
+Random forest, like its name implies, consists of a large number of individual decision trees that operate as an ensemble. Each individual tree in the random forest spits out a class prediction and the class with the most votes becomes our model’s prediction.
+```{r echo=FALSE}
+library(randomForest)
+
+rf_classifier <- randomForest(x = dataTrain,
+                          y = dataTrain$class,
+                          ntree = 300)
+
+rf_classifier
+```
+_The rf_classifier was able to accurately classify the text messages as ham and spam respectively with the class error of 0 which suggest that there is 100% accuracy of the model on the training set of observations._ 
+
+Making Predictions and evaluating the Random Forest Classifier.
+
+We want to evaluate the model using the test_set and see if our model can match the 100% accuracy on this new set of data in comparison to the one obtained from the training set.
+```{r}
+# Predicting the Test set results
+rf_pred = predict(rf_classifier, newdata = dataTest)
+
+# Making the Confusion Matrix
+confusionMatrix(table(rf_pred,dataTest$class))
+```
+_The Random Forest Classifier (rf_classifier) performed well on this data set as the model accuracy is 1.0 with a 95% CI of 0.994._ 
+
+
+### Naive Bayes Classifier
+
+It is a Machine Learning model that is based upon the assumptions of conditional probability as proposed by Bayes’ Theorem. It is fast and easy.
+```{r}
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+system.time( classifier_nb <- naiveBayes(dataTrain, dataTrain$class, laplace = 1,
+                                         trControl = control,tuneLength = 7) )
+```
+
+Making Predictions and evaluating the Naive Bayes Classifier.
+```{r}
+nb_pred = predict(classifier_nb, type = 'class', newdata = dataTest)
+
+confusionMatrix(nb_pred, dataTest$class)
+```
+_Naive Bayes Classifier performed well on this data set as the model accuracy is 1.0 with a 95% CI of 0.994._ 
+
+
+### XGBoost: eXtreme Gradient Boosting
+
+```{r}
+test_split<-round(.25*dim(text_dtm)[1])
+
+test_text<-text_dtm[1:test_split,]
+train_text<-text_dtm[(test_split+1):dim(text_dtm)[1],]
+```
+
+```{r}
+test_target<-data$target[1:test_split]
+train_target<-data$target[(test_split+1):dim(data)[1]]
+```
+
+```{r warning=FALSE}
+xgb <- xgboost(data = as.matrix(train_text), 
+               label = as.vector(train_target),
+               max.depth = 7, eta = 1, 
+               nthread = 2, nrounds = 2,
+               objective = "binary:logistic")
+```
+```{r}
+xg_pred <- predict(xgb, as.matrix(test_text))
+```
+
+```{r warning=FALSE}
+# Convert probabilities to binary
+xg_pred<- ifelse(xg_pred >0.5, 1,0)
+```
+
+```{r warning=FALSE}
+# Evaluate
+confusionMatrix(data = factor(xg_pred, levels=c(1,0)),
+                reference = factor(test_target, levels=c(1,0)),
+                positive = "1", dnn = c("Prediction", "Actual"))
+```
+
+
+## Conclusion
+
+The text classification analysis based on Random Forest, Naive Bayes, and XGBoost effectively categorized an email as spam or ham. I had difficulies on loading and unzipping the file format in Github.  
